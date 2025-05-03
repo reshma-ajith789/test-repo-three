@@ -1,0 +1,65 @@
+name: Build and Package Angular app v2
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy from'
+        required: true
+        default: 'main'
+
+jobs:
+  build-package:
+    name: Build and Package
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Angular App
+        run: npm run build
+
+      # Upload Angular dist folder as a GitHub artifact
+      - name: Upload Angular Dist Folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Prepare Deployment Package
+        run: |
+          mkdir -p deploy
+
+          # Copy Angular build output
+          cp -r dist deploy/
+
+          # Copy server.js, package.json, etc.
+          cp artifacts/server.js deploy/
+          cp artifacts/package.json deploy/
+
+          if [ -d "artifacts/.ebextensions" ]; then
+            cp -r artifacts/.ebextensions deploy/
+          fi
+          cd deploy
+          zip -r ../deployment-package.zip .
+
+      - name: Unzip and List Contents of Deployment Package
+        run: |
+          unzip -l deployment-package.zip
+
+      - name: Upload Angular Dist Folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package-artifact
+          path: deployment-package.zip
