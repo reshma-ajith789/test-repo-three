@@ -12,6 +12,7 @@ jobs:
   build-package:
     name: Build and Package
     runs-on: ubuntu-latest
+    environment: build-app
 
     steps:
       - name: Checkout Code
