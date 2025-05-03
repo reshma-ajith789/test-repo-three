@@ -12,9 +12,8 @@ jobs:
   build-package:
     name: Build and Package
     runs-on: ubuntu-latest
-    #environment: build-app
+    environment: build-app
     steps:
-      - uses: trstringer/manual-approval@v1
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
@@ -30,14 +29,24 @@ jobs:
 
       - name: Build Angular App
         run: npm run build
-
+        
+  upload-dist:
+    name: Upload dist folder
+    runs-on: ubuntu-latest
+    environment: build-app
+    steps:
       # Upload Angular dist folder as a GitHub artifact
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-
+          
+  prepare-package:
+    name: Prepare deployment package
+    runs-on: ubuntu-latest
+    environment: build-app
+    steps:
       - name: Prepare Deployment Package
         run: |
           mkdir -p deploy
