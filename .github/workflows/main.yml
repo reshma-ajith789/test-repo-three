@@ -46,8 +46,7 @@ jobs:
   prepare-package:
     name: Prepare deployment package
     runs-on: ubuntu-latest
-    needs: upload-dist
-    environment: build-app
+    environment: upload-artifact
     steps:
       - name: Prepare Deployment Package
         run: |
