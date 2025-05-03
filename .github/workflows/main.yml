@@ -1,6 +1,9 @@
 name: Build and Package Angular app v2
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       branch:
@@ -12,7 +15,7 @@ jobs:
   build-package:
     name: Build and Package
     runs-on: ubuntu-latest
-
+    environment: build-app
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -29,14 +32,25 @@ jobs:
 
       - name: Build Angular App
         run: npm run build
-
+        
+  upload-dist:
+    name: Upload dist folder
+    runs-on: ubuntu-latest
+    needs: build-package
+    environment: build-app
+    steps:
       # Upload Angular dist folder as a GitHub artifact
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-
+          
+  prepare-package:
+    name: Prepare deployment package
+    runs-on: ubuntu-latest
+    environment: upload-artifact
+    steps:
       - name: Prepare Deployment Package
         run: |
           mkdir -p deploy
