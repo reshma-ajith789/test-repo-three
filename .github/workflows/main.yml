@@ -10,12 +10,9 @@ on:
 
       run_optional_job:
         description: 'Run the optional third job?'
-        required: true
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'  
+        required: false
+        default: false
+        type: boolean  
 
 jobs:
   build-package:
@@ -53,7 +50,7 @@ jobs:
           path: dist/
           
   prepare-package:
-    if: ${{ github.event.inputs.run_optional_job == 'true' }}
+    if: ${{ github.event.inputs.run_optional_job == true }}
     name: Prepare deployment package
     runs-on: ubuntu-latest
     environment: upload-artifact
