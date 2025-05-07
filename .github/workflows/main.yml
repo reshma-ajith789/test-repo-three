@@ -1,15 +1,21 @@
 name: Build and Package Angular app v2
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to deploy from'
         required: true
         default: 'main'
+
+      run_optional_job:
+        description: 'Run the optional third job?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'  
 
 jobs:
   build-package:
@@ -47,6 +53,7 @@ jobs:
           path: dist/
           
   prepare-package:
+    if: ${{ github.event.inputs.run_optional_job == 'true' }}
     name: Prepare deployment package
     runs-on: ubuntu-latest
     environment: upload-artifact
