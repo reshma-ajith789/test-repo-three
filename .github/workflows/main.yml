@@ -70,11 +70,6 @@ jobs:
     needs: build-package
 
     steps:
-      - name: Install EB CLI
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install awsebcli
-
       - name: Deploy to Elastic Beanstalk
         run: |
           eb init NodeJS-app3 --region eu-central-1
