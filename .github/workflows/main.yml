@@ -67,6 +67,7 @@ jobs:
   deployment:
     name: Deployment to AWS
     runs-on: self-hosted
+    needs: build-package
 
     steps:
       - name: Install EB CLI
