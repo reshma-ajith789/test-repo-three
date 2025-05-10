@@ -80,7 +80,7 @@ jobs:
       - name: Create new EB application version
         run: |
           aws elasticbeanstalk create-application-version \
-            --application-name "NodeJS-app3" \
+            --application-name "NodeJS-app4" \
             --version-label "deploy-${{ github.run_number }}" \
             --source-bundle S3Bucket=elasticbeanstalk-eu-central-1-041063310378,S3Key=app-${{ github.run_number }}.zip \
             --auto-create-application
@@ -88,5 +88,5 @@ jobs:
       - name: Deploy to Elastic Beanstalk environment
         run: |
           aws elasticbeanstalk update-environment \
-            --environment-name "NodeJS-app3-env" \
+            --environment-name "NodeJS-app4-env" \
             --version-label "deploy-${{ github.run_number }}"
