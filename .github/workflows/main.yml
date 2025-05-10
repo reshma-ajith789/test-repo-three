@@ -90,3 +90,4 @@ jobs:
           aws elasticbeanstalk update-environment \
             --environment-name "NodeJS-app4-env" \
             --version-label "deploy-${{ github.run_number }}"
+            --debug
