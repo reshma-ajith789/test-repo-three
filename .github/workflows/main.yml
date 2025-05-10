@@ -74,7 +74,10 @@ jobs:
 
     steps:
       - name: Deploy to Elastic Beanstalk
-        run: |
-          eb init NodeJS-app3 --region eu-central-1
-          eb use NodeJS-app3-env
-          eb deploy
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          application_name: "NodeJS-app3"
+          environment_name: "NodeJS-app3-env"
+          version_label: "v1.0.0-${{ github.sha }}"
+          region: "eu-central-1"
+          deployment_package: deployment-package.zip
