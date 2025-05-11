@@ -77,4 +77,4 @@ jobs:
         run: |
           eb init NodeJS-app8 --region eu-central-1
           eb use NodeJS-app8-env
-          eb deploy --staged
+          eb deploy --label test-$(date +%d%m-%H%M%S) --source-bundle deployment-package.zip
