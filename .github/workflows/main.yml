@@ -73,12 +73,20 @@ jobs:
     needs: build-package
 
     steps:
-      - name: Upload ZIP to S3
+      - name: Upload Deployment ZIP to S3
         run: |
           aws s3 cp deployment-package.zip s3://elasticbeanstalk-eu-central-1-041063310378/NodeJS-app8/deployment-package.zip
-    
+
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb init NodeJS-app8 --region eu-central-1
-          eb use NodeJS-app8-env
-          eb deploy --label test-$(date +%d%m-%H%M%S) --source-bundle s3://elasticbeanstalk-eu-central-1-041063310378/NodeJS-app8/deployment-package.zip
+          aws elasticbeanstalk create-application-version \
+            --application-name NodeJS-app8 \
+            --version-label test-$(date +%d%m-%H%M%S) \
+            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="NodeJS-app8/deployment-package.zip" \
+            --region eu-central-1
+
+          aws elasticbeanstalk update-environment \
+            --application-name NodeJS-app8 \
+            --environment-name NodeJS-app8-env \
+            --version-label test-$(date +%d%m-%H%M%S) \
+            --region eu-central-1
