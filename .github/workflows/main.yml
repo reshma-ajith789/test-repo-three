@@ -81,4 +81,4 @@ jobs:
         run: |
           eb init NodeJS-app8 --region eu-central-1
           eb use NodeJS-app8-env
-          eb deploy --label test-$(date +%d%m-%H%M%S) --source-bundle deployment-package.zip
+          eb deploy --label test-$(date +%d%m-%H%M%S) --source-bundle s3://elasticbeanstalk-eu-central-1-041063310378/NodeJS-app8/deployment-package.zip
