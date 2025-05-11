@@ -75,5 +75,5 @@ jobs:
     steps:
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb use NodeJS-app6-env
+          eb use NodeJS-app6-env --region eu-central-1
           eb deploy
