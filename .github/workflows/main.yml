@@ -8,17 +8,11 @@ on:
         required: true
         default: 'main'
 
-      run_optional_job:
-        description: 'Run the optional third job?'
-        required: false
-        default: false
-        type: boolean  
-
 jobs:
   build-package:
     name: Build and Package
-    runs-on: ubuntu-latest
-    environment: build-app
+    runs-on: self-hosted
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -30,31 +24,22 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Clear cache
+        run: npm cache clean --force
+
       - name: Install Dependencies
         run: npm install
 
       - name: Build Angular App
         run: npm run build
-        
-  upload-dist:
-    name: Upload dist folder
-    runs-on: ubuntu-latest
-    needs: build-package
-    environment: build-app
-    steps:
+
       # Upload Angular dist folder as a GitHub artifact
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-          
-  prepare-package:
-    if: ${{ github.event.inputs.run_optional_job == true }}
-    name: Prepare deployment package
-    runs-on: ubuntu-latest
-    environment: upload-artifact
-    steps:
+
       - name: Prepare Deployment Package
         run: |
           mkdir -p deploy
@@ -81,3 +66,15 @@ jobs:
         with:
           name: deployment-package-artifact
           path: deployment-package.zip
+
+  deployment:
+    name: Deployment to AWS
+    runs-on: self-hosted
+    needs: build-package
+
+    steps:
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          eb init NodeJS-app7 --region eu-central-1
+          eb use NodeJS-app7-env
+          eb deploy --debug --staged
