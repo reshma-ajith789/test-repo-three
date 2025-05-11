@@ -75,6 +75,6 @@ jobs:
     steps:
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb init NodeJS-app6 --region eu-central-1 --platform "Node.js 22 running on 64bit Amazon Linux 2023"
+          eb init NodeJS-app6 --region eu-central-1
           eb use NodeJS-app6-env
           eb deploy
