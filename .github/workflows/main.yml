@@ -73,9 +73,6 @@ jobs:
     needs: build-package
 
     steps:
-      - name: Move Artifact to Root
-        run: mv deployment-package.zip ./deployment-package.zip
-    
       - name: Upload to existing Elastic Beanstalk S3 bucket
         run: |
           aws s3 cp deployment-package.zip s3://elasticbeanstalk-eu-central-1-041063310378/app-${{ github.run_number }}.zip
