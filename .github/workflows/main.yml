@@ -73,6 +73,10 @@ jobs:
     needs: build-package
 
     steps:
+      - name: Upload ZIP to S3
+        run: |
+          aws s3 cp deployment-package.zip s3://elasticbeanstalk-eu-central-1-041063310378/NodeJS-app8/deployment-package.zip
+    
       - name: Deploy to Elastic Beanstalk
         run: |
           eb init NodeJS-app8 --region eu-central-1
