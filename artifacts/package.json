@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0",
+    "angular-artifacts": "file:",
+    "express": "^4.21.2",
     "path": "^0.12.7"
   }
 }
