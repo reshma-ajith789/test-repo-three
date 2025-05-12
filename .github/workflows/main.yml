@@ -42,37 +42,32 @@ jobs:
 
       - name: Prepare Deployment Package
         run: |
+         # Generate the unique filename based on the current date and time
+         ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
+        
           mkdir -p deploy
-
           # Copy Angular build output
           cp -r dist deploy/
-
           # Copy server.js, package.json, etc.
           cp artifacts/server.js deploy/
           cp artifacts/package.json deploy/
-
           if [ -d "artifacts/.ebextensions" ]; then
             cp -r artifacts/.ebextensions deploy/
           fi
           cd deploy
-          # Get the current date in ddmm format
-          DATE=$(date +%d%m%H%M)
-          # Set the dynamic ZIP filename
-          ZIP_FILENAME="testone${DATE}.zip"
-          # Create the ZIP with the dynamic filename
-          zip -r "../${ZIP_FILENAME}" .
-          # Export the ZIP filename so it's available in the environment
-          echo "ZIP_FILENAME=${ZIP_FILENAME}" >> $GITHUB_ENV
-
+          zip -r "../$ZIP_FILENAME" .
+          echo "Created zip file: $ZIP_FILENAME"
+          
       - name: Unzip and List Contents of Deployment Package
         run: |
-          unzip -l ${{ env.ZIP_FILENAME }}
+          ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
+          unzip -l $ZIP_FILENAME
           
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: ${{ env.ZIP_FILENAME }}
+          path: deployment-package.zip
 
   deployment:
     name: Deployment to AWS
@@ -85,12 +80,8 @@ jobs:
     
       - name: Upload Deployment ZIP to S3
         run: |
-          # Generate the new dynamic ZIP filename in the deployment job
-          DATE=$(date +%d%m%H%M)
-          ZIP_FILENAME="testone${DATE}.zip"
-          # Upload the newly named ZIP file to S3
-          echo "Uploading file: $ZIP_FILENAME"
-          aws s3 $ZIP_FILENAME s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME
+          ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
+          aws s3 cp $ZIP_FILENAME s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
@@ -102,4 +93,4 @@ jobs:
             --application-name NodeJS-app8 \
             --environment-name NodeJS-app8-env \
             --version-label $VERSION_LABEL \
-            --region eu-central-1
+            --region eu-central-1
