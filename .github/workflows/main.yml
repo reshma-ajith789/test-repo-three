@@ -61,16 +61,18 @@ jobs:
           ZIP_FILENAME="testone${DATE}.zip"
           # Create the ZIP with the dynamic filename
           zip -r "../${ZIP_FILENAME}" .
+          # Export the ZIP filename so it's available in the environment
+          echo "ZIP_FILENAME=${ZIP_FILENAME}" >> $GITHUB_ENV
 
       - name: Unzip and List Contents of Deployment Package
         run: |
-          unzip -l testone${DATE}.zip
+          unzip -l ${{ env.ZIP_FILENAME }}
           
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: testone${DATE}.zip
+          path: ${{ env.ZIP_FILENAME }}
 
   deployment:
     name: Deployment to AWS
@@ -83,13 +85,13 @@ jobs:
     
       - name: Upload Deployment ZIP to S3
         run: |
-          aws s3 cp testone${DATE}.zip s3://elasticbeanstalk-eu-central-1-041063310378/testone${DATE}.zip
+          aws s3 cp ${{ env.ZIP_FILENAME }} s3://elasticbeanstalk-eu-central-1-041063310378/${{ env.ZIP_FILENAME }}
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name NodeJS-app8 \
             --version-label $VERSION_LABEL \
-            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="testone${DATE}.zip" \
+            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="${{ env.ZIP_FILENAME }}" \
             --region eu-central-1
           aws elasticbeanstalk update-environment \
             --application-name NodeJS-app8 \
