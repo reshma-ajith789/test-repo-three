@@ -76,6 +76,7 @@ jobs:
       - name: Upload Deployment ZIP to S3
         run: |
           aws s3 cp testone-${{ github.run_number }}.zip s3://elasticbeanstalk-eu-central-1-041063310378/testone-${{ github.run_number }}.zip
+      
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
@@ -83,6 +84,7 @@ jobs:
             --version-label $VERSION_LABEL \
             --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="testone-${{ github.run_number }}.zip" \
             --region eu-central-1
+            
           aws elasticbeanstalk update-environment \
             --application-name NodeJS-app8 \
             --environment-name NodeJS-app8-env \
