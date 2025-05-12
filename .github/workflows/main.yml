@@ -55,17 +55,22 @@ jobs:
             cp -r artifacts/.ebextensions deploy/
           fi
           cd deploy
-          zip -r ../deployment-package.zip .
+          # Get the current date in ddmm format
+          DATE=$(date +%d%m%H%M)
+          # Set the dynamic ZIP filename
+          ZIP_FILENAME="testone${DATE}.zip"
+          # Create the ZIP with the dynamic filename
+          zip -r "../${ZIP_FILENAME}" .
 
       - name: Unzip and List Contents of Deployment Package
         run: |
-          unzip -l deployment-package.zip
-
+          unzip -l testone${DATE}.zip
+          
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: deployment-package.zip
+          path: testone${DATE}.zip
 
   deployment:
     name: Deployment to AWS
@@ -78,13 +83,13 @@ jobs:
     
       - name: Upload Deployment ZIP to S3
         run: |
-          aws s3 cp deployment-package.zip s3://elasticbeanstalk-eu-central-1-041063310378/deployment-package.zip
+          aws s3 cp testone${DATE}.zip s3://elasticbeanstalk-eu-central-1-041063310378/testone${DATE}.zip
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name NodeJS-app8 \
             --version-label $VERSION_LABEL \
-            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="deployment-package.zip" \
+            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="testone${DATE}.zip" \
             --region eu-central-1
           aws elasticbeanstalk update-environment \
             --application-name NodeJS-app8 \
