@@ -44,6 +44,7 @@ jobs:
         run: |
          # Generate the unique filename based on the current date and time
          ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
+         echo "ZIP_FILENAME=$ZIP_FILENAME" >> $GITHUB_ENV
         
           mkdir -p deploy
           # Copy Angular build output
@@ -60,14 +61,15 @@ jobs:
           
       - name: Unzip and List Contents of Deployment Package
         run: |
-          ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
-          unzip -l $ZIP_FILENAME
+          unzip -l "$ZIP_FILENAME"
+          env:
+            ZIP_FILENAME: ${{ env.ZIP_FILENAME }}
           
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: $ZIP_FILENAME
+          path: ${{ env.ZIP_FILENAME }}
 
   deployment:
     name: Deployment to AWS
@@ -80,8 +82,7 @@ jobs:
     
       - name: Upload Deployment ZIP to S3
         run: |
-          ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
-          aws s3 cp $ZIP_FILENAME s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME
+          aws s3 cp "$ZIP_FILENAME" "s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME"
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
