@@ -58,7 +58,7 @@ jobs:
         run: |
           unzip -l testone-${{ github.run_number }}.zip
           
-      - name: Upload Angular Dist Folder
+      - name: Upload Deployment Package
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
@@ -88,4 +88,4 @@ jobs:
             --application-name NodeJS-app8 \
             --environment-name NodeJS-app8-env \
             --version-label $VERSION_LABEL \
-            --region eu-central-1
+            --region eu-central-1
