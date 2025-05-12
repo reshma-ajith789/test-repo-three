@@ -42,10 +42,6 @@ jobs:
 
       - name: Prepare Deployment Package
         run: |
-         # Generate the unique filename based on the current date and time
-         ZIP_FILENAME="test$(date +'%d%m%H%M').zip"
-         echo "ZIP_FILENAME=$ZIP_FILENAME" >> $GITHUB_ENV
-        
           mkdir -p deploy
           # Copy Angular build output
           cp -r dist deploy/
@@ -56,20 +52,17 @@ jobs:
             cp -r artifacts/.ebextensions deploy/
           fi
           cd deploy
-          zip -r "../$ZIP_FILENAME" .
-          echo "Created zip file: $ZIP_FILENAME"
+          zip -r ../testone-${{ github.run_number }}.zip .
           
       - name: Unzip and List Contents of Deployment Package
         run: |
-          unzip -l "$ZIP_FILENAME"
-          env:
-            ZIP_FILENAME: ${{ env.ZIP_FILENAME }}
+          unzip -l testone-${{ github.run_number }}.zip
           
       - name: Upload Angular Dist Folder
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: ${{ env.ZIP_FILENAME }}
+          path: testone-${{ github.run_number }}.zip
 
   deployment:
     name: Deployment to AWS
@@ -82,13 +75,13 @@ jobs:
     
       - name: Upload Deployment ZIP to S3
         run: |
-          aws s3 cp "$ZIP_FILENAME" "s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME"
+          aws s3 cp testone-${{ github.run_number }}.zip s3://elasticbeanstalk-eu-central-1-041063310378/testone-${{ github.run_number }}.zip
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name NodeJS-app8 \
             --version-label $VERSION_LABEL \
-            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="$ZIP_FILENAME" \
+            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="testone-${{ github.run_number }}.zip" \
             --region eu-central-1
           aws elasticbeanstalk update-environment \
             --application-name NodeJS-app8 \
