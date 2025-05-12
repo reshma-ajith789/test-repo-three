@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Set Version Label
-        run: echo "VERSION_LABEL=test-$(date +%d%m-%H%M%S)" >> $GITHUB_ENV
+        run: echo "VERSION_LABEL=1.8.${{ github.run_number }}" >> $GITHUB_ENV
     
       - name: Upload Deployment ZIP to S3
         run: |
