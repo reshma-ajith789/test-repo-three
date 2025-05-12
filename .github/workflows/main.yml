@@ -67,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-artifact
-          path: deployment-package.zip
+          path: $ZIP_FILENAME
 
   deployment:
     name: Deployment to AWS
