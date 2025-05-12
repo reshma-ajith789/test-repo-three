@@ -66,31 +66,3 @@ jobs:
         with:
           name: deployment-package-artifact
           path: deployment-package.zip
-
-  deployment:
-    name: Deployment to AWS
-    runs-on: self-hosted
-    needs: build-package
-
-    steps:
-
-      - name: Set Version Label
-        run: echo "VERSION_LABEL=test-$(date +%d%m-%H%M%S)" >> $GITHUB_ENV
-    
-      - name: Upload Deployment ZIP to S3
-        run: |
-          aws s3 cp deployment-package.zip s3://elasticbeanstalk-eu-central-1-041063310378/NodeJS-app8/deployment-package.zip
-
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version \
-            --application-name NodeJS-app8 \
-            --version-label $VERSION_LABEL \
-            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="NodeJS-app8/deployment-package.zip" \
-            --region eu-central-1
-
-          aws elasticbeanstalk update-environment \
-            --application-name NodeJS-app8 \
-            --environment-name NodeJS-app8-env \
-            --version-label $VERSION_LABEL \
-            --region eu-central-1
