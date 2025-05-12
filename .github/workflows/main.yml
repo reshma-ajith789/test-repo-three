@@ -82,21 +82,21 @@ jobs:
     steps:
       - name: Set Version Label
         run: echo "VERSION_LABEL=test-$(date +%d%m-%H%M%S)" >> $GITHUB_ENV
-
-      - name: Download Deployment Package
-        uses: actions/download-artifact@v4
-        with:
-          name: deployment-package-artifact
     
       - name: Upload Deployment ZIP to S3
         run: |
-          aws s3 cp deployment-package-artifact/${{ env.ZIP_FILENAME }} s3://elasticbeanstalk-eu-central-1-041063310378/${{ env.ZIP_FILENAME }}
+          # Generate the new dynamic ZIP filename in the deployment job
+          DATE=$(date +%d%m%H%M)
+          ZIP_FILENAME="testone${DATE}.zip"
+          # Upload the newly named ZIP file to S3
+          echo "Uploading file: $ZIP_FILENAME"
+          aws s3 $ZIP_FILENAME s3://elasticbeanstalk-eu-central-1-041063310378/$ZIP_FILENAME
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name NodeJS-app8 \
             --version-label $VERSION_LABEL \
-            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="${{ env.ZIP_FILENAME }}" \
+            --source-bundle S3Bucket="elasticbeanstalk-eu-central-1-041063310378",S3Key="$ZIP_FILENAME" \
             --region eu-central-1
           aws elasticbeanstalk update-environment \
             --application-name NodeJS-app8 \
